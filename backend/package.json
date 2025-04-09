@@ -1,0 +1,11 @@
+{
+  "name": "express-api",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev":"node --watch --env-file=.env index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
