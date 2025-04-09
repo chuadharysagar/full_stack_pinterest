@@ -1,10 +1,9 @@
 import express from "express"
+import { test } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
-router.get("/test",(req,res)=>{
-   res.json("hello from user router testing");
-})
+router.get("/test",test)
 
 
 export default router;
