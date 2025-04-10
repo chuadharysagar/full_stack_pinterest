@@ -4,11 +4,15 @@ import pinRouter from './routes/pin.route.js'
 import commentRouter from './routes/comment.route.js'
 import boardRouter from './routes/board.route.js'
 import connectDB from "./utils/connectDB.js"
+import cors from 'cors'
 
 
 
 // commad to start the server : node --watch --env-file=.env index.js
 const app = express();
+
+app.use(express.json()); // to freely use the json formate all across the application
+app.use(cors());   // to access frontend from backend
 
 // Database connection 
 
