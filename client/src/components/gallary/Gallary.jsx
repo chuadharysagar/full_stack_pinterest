@@ -170,18 +170,23 @@ import axios from 'axios';
 //   },
 // ];
 
-const fetchPins = async ({ pageParam, search ,userId }) => {
-  const res = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/pins?cursor=
-    ${pageParam || " "}
-    &search=${search || " "}
-    &userId=${userId || " "}
-    `);
+const fetchPins = async ({ pageParam, search, userId, boardId }) => {
+  const res = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/pins`, {
+    params: {
+      cursor: pageParam || 0,
+      search: search || "",
+      userId: userId || "",
+      boardId: boardId || ""
+    }
+  });
   return res.data;
-}
-const Gallary = ({ search , userId}) => {
+};
+
+
+const Gallary = ({ search, userId ,boardId }) => {
   const { status, data, fetchNextPage, hasNextPage } = useInfiniteQuery({
-    queryKey: ['pins'],
-    queryFn: ({ pageParam = 0 }) => fetchPins({ pageParam, search ,userId}),
+    queryKey: ['pins', search, userId ,boardId],
+    queryFn: ({ pageParam = 0 }) => fetchPins({ pageParam, search, userId ,boardId}),
     initialPageParam: 0,
     getNextPageParam: (lastpage, pages) => lastpage.nextCursor,
   });

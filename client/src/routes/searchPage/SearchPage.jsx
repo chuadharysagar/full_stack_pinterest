@@ -4,11 +4,13 @@ import Gallary from '../../components/gallary/Gallary'
 import { useSearchParams } from 'react-router'
 
 const SearchPage = () => {
-  let [searhcParams] = useSearchParams();
+  let [searchParams] = useSearchParams();
 
-  const search = searhcParams.get("search");
+  const search = searchParams.get("search");
+  const boardId = searchParams.get("boardId");
+
   return (
-    <Gallary search ={search}/>
+    <Gallary search ={search} boardId={boardId}/>
   )
 }
 

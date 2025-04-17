@@ -2,26 +2,26 @@ import React, { useState } from 'react'
 import './ProfilePage.css'
 import Image from '../../components/Image/Image'
 import Gallary from '../../components/gallary/Gallary'
-import Collections from '../../components/Collections/Collections'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
-import apiRequest from "../../utils/apiRequest.js"
+import apiRequest from "../../utils/apiRequest"
+import Board from '../../components/Board/Board'
 
 const ProfilePage = () => {
   const [type, setType] = useState("saved");
  
-  const {username} = useParams();
+  const { username } = useParams();
 
-  const {isPending , error , data} = useQuery({
-    queryKey:["profile",username],
-    queryFn:()=> apiRequest.get(`/users/${username}`).then(res=> res.data),
-  })
+  const { isPending, error, data } = useQuery({
+    queryKey: ["profile", username],
+    queryFn: () => apiRequest.get(`/users/${username}`).then((res) => res.data),
+  });
 
-   if(isPending) return "Loading...";
+  if (isPending) return "Loading...";
 
-   if(error) return "An Error has Ocuured" + error.message;
+  if (error) return "An error has occurred: " + error.message;
 
-   if(!data) return "User not found";
+  if (!data) return "User not found!";
 
   //  console.log(data);
 
@@ -51,7 +51,7 @@ const ProfilePage = () => {
         onClick={()=> setType("saved")}
         >Saved</span> 
       </div>
-      {type==="created" ?<Gallary userId = {data._id}/>:<Collections/>}
+      {type==="created" ?<Gallary userId = {data._id}/>:<Board userId = {data._id}/>}
     </div>
   )
 }
