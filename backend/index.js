@@ -12,17 +12,32 @@ import cors from 'cors'
 const app = express();
 
 app.use(express.json()); // to freely use the json formate all across the application
-app.use(cors());   // to access frontend from backend
+app.use(cors({
+   origin: process.env.CLIENT_URL,
+   credentials: true,
+}));   
+// to access frontend from backend
 
 // Database connection 
 
 // when the req will come to /users then it will be redirected to the useRouter endPoint
-app.use("/users",userRouter);
-app.use("/pins",pinRouter);
-app.use("/comments",commentRouter);
-app.use("/boards",boardRouter);
+app.use("/users", userRouter);
+app.use("/pins", pinRouter);
+app.use("/comments", commentRouter);
+app.use("/boards", boardRouter);
 
-app.listen(3000,()=>{
+
+app.use((error, req, res, next) => {
+   res.status(error.status || 500);
+
+   res.json({
+      message: error.message || "Something wennt wrong!",
+      status: error.status,
+      stack: error.stack,
+   });
+});
+
+app.listen(3000, () => {
    connectDB();
    console.log("Server is Running!");
 })

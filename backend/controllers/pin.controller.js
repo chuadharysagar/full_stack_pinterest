@@ -1,35 +1,78 @@
 import Pin from "../modals/pin.model.js"
 import User from "../modals/user.model.js"
+import mongoose from "mongoose";
 
+// export const getPins = async (req, res) => {
+//   const pageNumber = Number(req.query.cursor) || 0;
+//   const search = req.query.search;
+//   const userId = req.query.userId;
+//   const LIMIT = 21;
+
+//   const pins = await Pin.find(
+//     search
+//       ? {
+//         $or: [
+//           { title: { $regex: search, $options: "i" } },
+//           { tags: { $in: [search] } },
+//         ],
+//       }
+//       : userId
+//         ? { user: userId }
+//         : {}
+//   )
+//     .limit(LIMIT)
+//     .skip(pageNumber * LIMIT);
+
+//   const hasNextPage = pins.length === LIMIT;
+
+//   // await new Promise((resolve) => setTimeout(resolve, 3000));
+
+//   res
+//     .status(200)
+//     .json({ pins, nextCursor: hasNextPage ? pageNumber + 1 : null });
+// };
 export const getPins = async (req, res) => {
-  const pageNumber = Number(req.query.cursor);
-  const search = req.query.search;
+  const pageNumber = Number(req.query.cursor) || 0;
+  const search = req.query.search?.trim();
   const userId = req.query.userId;
+  const boardId = req.query.boardId;
 
   const LIMIT = 21;
-  const pins = await Pin.find(
-    search ? {
-      $or: [
-        { title: { $regex: search, $options: "i" } },
-        { tags: { $in: [search] } },
-      ],
-    } : userId ?
-      { user: userId }
-      : {}
-  )
-    .limit(LIMIT)
-    .skip(pageNumber * LIMIT);
-  // limit for the limit the data fetching from databse 
 
-  const hasNextPage = pins.length === LIMIT;
+  const query = {};
 
-  // await new Promise(resolve => setTimeout(resolve, 2000));
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { tags: { $in: [search] } },
+    ];
+  }
 
-  res.status(200).json({ pins, nextCursor: hasNextPage ? pageNumber + 1 : null });
-}
+  if (userId) {
+    query.user = userId;
+  }
 
-// Get the single  pin by ID
-import mongoose from "mongoose";
+  if (boardId) {
+    query.board = boardId;
+  }
+
+  try {
+    const pins = await Pin.find(query)
+      .limit(LIMIT)
+      .skip(pageNumber * LIMIT);
+
+    const hasNextPage = pins.length === LIMIT;
+
+    res.status(200).json({
+      pins,
+      nextCursor: hasNextPage ? pageNumber + 1 : null,
+    });
+  } catch (err) {
+    console.error("Error fetching pins:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 export const getPin = async (req, res) => {
   try {
