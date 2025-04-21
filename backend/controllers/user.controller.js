@@ -20,6 +20,14 @@ export const registerUser = async (req, res) => {
       hashedPassword: newhashedPassword,
    })
 
+   // Set the cookies
+   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+   res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 100,
+   });
    // if eveything went well then return the user innformation without hashed password 
    const { hashedPassword, ...detailWithoutPassword } = user.toObject();
 
@@ -65,7 +73,9 @@ export const loginUser = async (req, res) => {
 
 // LOGOUT USER HERE
 export const logoutUser = async (req, res) => {
+   res.clearCookie("token");
 
+   res.status(200).json({ message: "Logout Sucessfull" });
 }
 
 // Get all the user without password (User Profile)

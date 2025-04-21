@@ -2,11 +2,16 @@ import React, { useState } from 'react'
 import './Authpage.css'
 import Image from '../../components/Image/Image'
 import apiRequest from '../../utils/apiRequest.js'
+import { useNavigate } from "react-router";
+import useAuthStore from '../../utils/authStore.js';
+
 
 const Authpage = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+  const{setCurrentUser} = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,6 +21,10 @@ const Authpage = () => {
     
     try {
       const response = await apiRequest.post(`/users/auth/${isRegister ? "register" : "login"}`, data);
+      
+      // After suceesfull login thenn redirect the user to the home page
+      setCurrentUser(response.data);
+      navigate("/");
      } catch (error) {
       setError(error.response.data.message);
     }
