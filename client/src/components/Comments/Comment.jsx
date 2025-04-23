@@ -1,6 +1,8 @@
 import './Comments.css'
 import Image from '../Image/Image'
 import {format} from 'timeago.js'
+import './Comments.css'
+
 
 const Comment = ({comment}) => {
    return (
