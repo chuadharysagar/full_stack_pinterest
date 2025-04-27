@@ -1,10 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import useEditorStore from '../../utils/editorStore'
 import Image from '../Image/Image';
 
 
 const Workspace = ({ previewImg }) => {
-  const { textOptions, setTextOptions } = useEditorStore();
+  const { textOptions, setTextOptions, canvasOptions, setCanvasOptions } = useEditorStore();
+
+  useEffect(() => {
+
+    if (canvasOptions.height == 0) {
+      const canvasHeight = (375 * previewImg.height) / previewImg.width;
+
+      setCanvasOptions({
+        ...canvasOptions, height: canvasHeight,
+        orientation: canvasHeight > 375 ? "portrait" : "landscape"
+      })
+    }
+
+  }, [previewImg, canvasOptions, setCanvasOptions])
 
   return (
     <div className='workspace'>
