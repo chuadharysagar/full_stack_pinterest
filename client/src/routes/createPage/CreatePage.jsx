@@ -1,15 +1,20 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import './CreatePage.css'
 import IKImage from '../../components/Image/Image'
 import useAuthStore from '../../utils/authStore'
 import { useNavigate } from 'react-router'
 import { useState } from 'react'
 import Editor from '../../components/Editor/Editor'
+import useEditorStore from '../../utils/editorStore'
+import apiRequest from '../../utils/apiRequest'
 
 const CreatePage = () => {
   // if auhtenticated the only allowed to create post 
   const { currentUser } = useAuthStore();
+  const { textOptions, canvasOptions } = useEditorStore();
+
   const navigate = useNavigate();
+  const formRef = useRef();
 
   useEffect(() => {
     if (!currentUser) {
@@ -31,21 +36,45 @@ const CreatePage = () => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
     img.src = objectUrl;
-        
+
     img.onload = () => {
       setPreviewImg({
-        url:objectUrl,
+        url: objectUrl,
         width: img.width,
         height: img.height,
       })
     }
   }, [file]);
 
+  // BACKEND CONNECTION 
+  const handleSubmit = async () => {
+    if (!isEditig) {
+      setIsEditing(false);
+    } else {
+      const formData = new FormData(formRef.current);
+      formData.append("media", file);
+      formData.append("textOptions", JSON.stringify(textOptions));
+      formData.append("canvasOptions", JSON.stringify(canvasOptions));
+    }
+
+    try {
+      const res = await apiRequest.post("/pins", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(err);
+    }
+  }
+
   return (
     <div className='createPage'>
       <div className="createTop">
         <h1>{isEditig ? "Design your Pin" : "Create Pin"}</h1>
-        <button>{isEditig ? "Done" : "Publish"}</button>
+        <button onClick={handleSubmit}>
+          {isEditig ? "Done" : "Publish"}</button>
       </div>
       {isEditig ? <Editor previewImg={previewImg} /> :
         (<div className="createBottom">
@@ -71,7 +100,7 @@ const CreatePage = () => {
                 onChange={(e) => setFile(e.target.files[0])}
               /></>)}
 
-          <form className="createForm">
+          <form className="createForm" ref={formRef}>
             <div className="createFormItem">
               <label htmlFor="">Title</label>
               <input type="text"
